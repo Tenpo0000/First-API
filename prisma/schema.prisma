@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url = env("DATABASE_URL")
+}
+
+model Books { 
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  titulo      String
+  autor       String 
+  descricao   String?
+  createdAdt  DateTime @default(now())
+  updateAt    DateTime @updatedAt
+} 
