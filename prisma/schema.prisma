@@ -9,10 +9,147 @@ datasource db {
 }
 
 model Books { 
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  titulo      String
-  autor       String 
-  descricao   String?
-  createdAdt  DateTime @default(now())
-  updateAt    DateTime @updatedAt
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  titulo        String
+  descricao     String?
+  anoPublicado  DateTime  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  categoriaIds  String[]     @db.ObjectId
+  categorias    Categoria[]  @relation(fields: [categoriaIds], references: [id])
+
+  autorId       String[]     @db.ObjectId
+  autor         Autor[]      @relation(fields: [autorId], references: [id])
+
+  editoraId     String?     @db.ObjectId
+  editora       Editora?    @relation(fields: [editoraId], references: [id])
+
+  emprestimos  Emprestimo[]
+  reservas     Reserva[]
+  favoritos    Favoritos[]
+  historico    Historico[]
 } 
+model Categoria { 
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  livroIds String[]  @db.ObjectId
+  livros    Books[]  @relation(fields: [livroIds], references: [id])
+}
+model Autor { 
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  livrosIds     String[]  @db.ObjectId
+  livros        Books[]   @relation(fields: [livrosIds], references: [id])
+  nome          String
+  nacionalidade String?
+  bio           String?
+  email         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+model Editora { 
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  livrosIds String[]  @db.ObjectId
+  livros    Books[]   
+  nome      String
+  cidade    String
+  pais      String
+  CNPJ      String?
+  site      String?
+  fundadaEm Int? 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Usuario {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String   @unique
+  nome        String
+  cep         String
+  senha       String
+  role        Role     @default(MEMBRO)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  emprestimo  Emprestimo[]
+  reserva     Reserva[]
+  favoritos   Favoritos[]
+  historico   Historico[]
+}
+
+enum Role {
+  ADMIN
+  MEMBRO
+}
+model Emprestimo {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  dataEmprestimo DateTime         @default(now())
+  dataDevolucao  DateTime?
+  status         StatusEmprestimo @default(ATIVO)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  usuarioId      String           @db.ObjectId
+  usuario        Usuario          @relation(fields: [usuarioId], references: [id])
+
+  livroId        String           @db.ObjectId
+  livro          Books            @relation(fields: [livroId], references: [id])
+}
+
+enum StatusEmprestimo {
+  ATIVO
+  DEVOLVIDO
+  ATRASADO
+}
+model Reserva { 
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  dataReserva DateTime      @default(now())
+  status      StatusReserva @default(PENDENTE)
+  createdAt   DateTime      @default(now())
+  updateAt    DateTime      @updatedAt
+
+  usuarioId   String      @db.ObjectId
+  usuario     Usuario     @relation(fields: [usuarioId], references: [id])
+
+  livroId     String      @db.ObjectId
+  livro       Books       @relation(fields: [livroId], references: [id])
+}
+
+enum StatusReserva{
+  PENDENTE
+  CONFIMARDO
+  CANCELADA
+}
+model Favoritos {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+
+  usuarioId String   @db.ObjectId
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+
+  livroId   String   @db.ObjectId
+  livro     Books    @relation(fields: [livroId], references: [id])
+
+  @@unique([usuarioId, livroId]) // usuário não pode favoritar o mesmo livro duas vezes
+}
+model Historico {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  acao      AcaoHistorico
+  createdAt DateTime    @default(now())
+
+  usuarioId String      @db.ObjectId
+  usuario   Usuario     @relation(fields: [usuarioId], references: [id])
+
+  livroId   String      @db.ObjectId
+  livro     Books       @relation(fields: [livroId], references: [id])
+}
+
+enum AcaoHistorico {
+  EMPRESTIMO
+  DEVOLUCAO
+  RESERVA
+  CANCELAMENTO
+}

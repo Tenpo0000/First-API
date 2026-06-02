@@ -13,6 +13,8 @@ export class BooksService {
     });
   }
 
+
+  // Metodos de busca:
   async findAll(){
     return prisma.books.findMany();
   }
