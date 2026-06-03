@@ -10,7 +10,7 @@ datasource db {
 
 model Books { 
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  titulo        String
+  titulo        String        @unique
   descricao     String?
   anoPublicado  DateTime  
   createdAt     DateTime     @default(now())
@@ -22,8 +22,8 @@ model Books {
   autorId       String[]     @db.ObjectId
   autor         Autor[]      @relation(fields: [autorId], references: [id])
 
-  editoraId     String?     @db.ObjectId
-  editora       Editora?    @relation(fields: [editoraId], references: [id])
+  editoraId     String?      @db.ObjectId
+  editora       Editora?     @relation(fields: [editoraId], references: [id])
 
   emprestimos  Emprestimo[]
   reservas     Reserva[]
@@ -32,18 +32,19 @@ model Books {
 } 
 model Categoria { 
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  nome      String
+  nome      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  livroIds String[]  @db.ObjectId
+  livroIds  String[]  @db.ObjectId
   livros    Books[]  @relation(fields: [livroIds], references: [id])
 }
+
 model Autor { 
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   livrosIds     String[]  @db.ObjectId
   livros        Books[]   @relation(fields: [livrosIds], references: [id])
-  nome          String
+  nome          String    @unique
   nacionalidade String?
   bio           String?
   email         String?
@@ -54,7 +55,7 @@ model Editora {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   livrosIds String[]  @db.ObjectId
   livros    Books[]   
-  nome      String
+  nome      String    @unique
   cidade    String
   pais      String
   CNPJ      String?
@@ -67,7 +68,7 @@ model Editora {
 model Usuario {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   email       String   @unique
-  nome        String
+  nome        String   @unique
   cep         String
   senha       String
   role        Role     @default(MEMBRO)
@@ -111,11 +112,11 @@ model Reserva {
   createdAt   DateTime      @default(now())
   updateAt    DateTime      @updatedAt
 
-  usuarioId   String      @db.ObjectId
-  usuario     Usuario     @relation(fields: [usuarioId], references: [id])
+  usuarioId   String        @db.ObjectId
+  usuario     Usuario       @relation(fields: [usuarioId], references: [id])
 
-  livroId     String      @db.ObjectId
-  livro       Books       @relation(fields: [livroId], references: [id])
+  livroId     String        @db.ObjectId
+  livro       Books         @relation(fields: [livroId], references: [id])
 }
 
 enum StatusReserva{

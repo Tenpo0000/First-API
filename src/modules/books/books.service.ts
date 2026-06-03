@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { prisma } from '../lib/prisma.js';
+import { prisma } from '../../lib/prisma.js';
 
 @Injectable()
+
+//Creates:
 export class BooksService {
   async create (titulo: string, autor: string, descricao?: string){
     return prisma.books.create({
@@ -12,9 +14,10 @@ export class BooksService {
       },      
     });
   }
+//
 
 
-  // Metodos de busca:
+// Gets:
   async findAll(){
     return prisma.books.findMany();
   }
@@ -37,17 +40,17 @@ export class BooksService {
       });
   }
 
-  async findCreatedAdt(createdAdt: Date){
+  async findCreatedAdt(createdAt: Date){
     return prisma.books.findMany({
-      where: {createdAdt},
+      where: {createdAt},
     });
   }
 
-  async findUpdateAt(updateAt: Date){
+  async findUpdateAt(updatedAt: Date){
     return prisma.books.findMany({
       where: {
-        updateAt: {
-          equals: updateAt,
+        updatedAt: {
+          equals: updatedAt,
         },
       },
     });
@@ -56,7 +59,7 @@ export class BooksService {
   async findUpdateAfter(date: Date) {
     return prisma.books.findMany({
       where: {
-        updateAt:{
+        updatedAt:{
           gte: date,
         },
       },
@@ -66,11 +69,12 @@ export class BooksService {
   async  findUpdateBetween(start: Date, end: Date){
     return prisma.books.findMany({
       where: {
-        updateAt: {
+        updatedAt: {
           gte: start,
           lte: end,
         },
       },
     });
   }
+//
 }
