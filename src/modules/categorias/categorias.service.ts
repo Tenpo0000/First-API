@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { prisma } from '../../lib/prisma.js';
 import { CreateCategoriaDto } from './dtos/create-categorias.dto.js';
 import { UpdateCategoriaDto} from './dtos/update-categorias.dto.js';
-import { error } from 'node:console';
+import { ValidationBookDto } from './dtos/validation-book.dto.js';
 @Injectable()
 export class CategoriasService {
 
@@ -16,14 +16,21 @@ export class CategoriasService {
     });
   }
 
-  // adiciona o livro para o array de livroId procurando pelo titulo do livro.
-  async addBookCategory(livroNome: string, categoriaNome: string){
+  async addBookCategory(dto: ValidationBookDto, categoriaNome: string){
     const livro = await prisma.books.findFirst({
-      where:{titulo: livroNome},
+      where:{titulo: dto.titulo},
     });
 
     if (!livro){
-      throw new Error(`Livro com título "${livroNome}" não foi encontrado!`);
+      throw new Error(`Livro com título "${dto.titulo}" não foi encontrado!`);
+    }
+
+    const categoria = await prisma.categoria.findFirst({
+      where: {nome: categoriaNome},
+    });
+    
+    if (!categoria) {
+      throw new Error(`Categoria "${categoriaNome}" não foi encontrada!`);
     }
 
     return prisma.categoria.update({
@@ -36,7 +43,7 @@ export class CategoriasService {
 //
 
 // Deletes:
-  async deletByName(nome: string) {
+  async deleteByName(nome: string) {
     return prisma.categoria.delete({
       where: {nome: nome},
     });
@@ -50,24 +57,54 @@ export class CategoriasService {
 //
 
 // Updates:
-  async updateByName(nomeAntigo: string, nomeNovo: string){
+  async updateByName(nomeAntigo: string, dto: UpdateCategoriaDto){
     return prisma.categoria.update({
       where:{ 
         nome: nomeAntigo
       },
       data:{
-        nome:nomeNovo   //Troca o nome da categoria informando o nome da categoria como referencia e o novo nome que será dado no lugar. 
+        nome: dto.nome,
+        titulo: dto.titulo,
       },
     });
   }
 
-  async updateById(id: string, nomeNovo: string){
+  async updateById(id: string, dto: UpdateCategoriaDto){
     return prisma.categoria.update({
       where:{
           id
       },
       data:{
-        nome:nomeNovo,
+        nome: dto.nome,
+        titulo: dto.titulo,
+      },
+    });
+  }
+
+  async deleteBookCategory(dto: ValidationBookDto, categoriaNome: string){
+    const livro = await prisma.books.findFirst({
+      where: {titulo: dto.titulo},
+    });
+    
+    if(!livro){
+      throw new Error(`Livro com título "${dto.titulo}" não foi encontrado!`);
+    }
+
+    const categoria = await prisma.categoria.findFirst({
+      where: {nome: categoriaNome},
+    });
+    
+    if (!categoria) {
+      throw new Error(`Categoria "${categoriaNome}" não foi encontrada!`);
+    }
+
+
+    const novosLivros = categoria.livroIds.filter(id => id !== livro.id);
+
+    return prisma.categoria.update({
+      where:{nome: categoriaNome},
+      data:{
+           livrosIds:{novosLivros},
       },
     });
   }
