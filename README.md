@@ -1,98 +1,200 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+# First-API — Sistema de Biblioteca
+ 
+API RESTful completa para gerenciamento de uma biblioteca, construída com **NestJS**, **TypeScript**, **Prisma ORM** e **MongoDB**.
+ 
+---
+ 
+## Tecnologias
+ 
+- [NestJS](https://nestjs.com/) — framework Node.js 
+- [TypeScript](https://www.typescriptlang.org/) — tipagem
+- [Prisma ORM](https://www.prisma.io/) — acesso ao banco de dados
+- [MongoDB](https://www.mongodb.com/) — banco de dados NoSQL
+- [ESLint](https://eslint.org/) + [Prettier](https://prettier.io/) — formatação de código
+---
+ 
+## Funcionalidades
+ 
+- Cadastro, listagem, edição e remoção de **livros**
+- Gerenciamento de **usuários** com controle de acesso por roles (`ADMIN` / `MEMBRO`)
+- Cadastro de **autores** com bio, nacionalidade e e-mail
+- Cadastro de **editoras** com CNPJ, cidade, país e site
+- Organização de livros por **categorias**
+- Controle de **empréstimos** com status (`ATIVO`, `DEVOLVIDO`, `ATRASADO`)
+- Sistema de **reservas** com status (`PENDENTE`, `CONFIRMADO`, `CANCELADA`)
+- **Favoritos** — cada usuário pode favoritar livros sem duplicatas
+- **Histórico** de ações dos usuários (empréstimo, devolução, reserva, cancelamento)
+---
+ 
+## Modelo de Dados
+ 
 ```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+Books          --- Categoria  (N:N)
+Books          --- Autor      (N:N)
+Books          --- Editora    (N:1)
+Books          --- Emprestimo (1:N)
+Books          --- Reserva    (1:N)
+Books          --- Favoritos  (1:N)
+Books          --- Historico  (1:N)
+Usuario        --- Emprestimo (1:N)
+Usuario        --- Reserva    (1:N)
+Usuario        --- Favoritos  (1:N)
+Usuario        --- Historico  (1:N)
 ```
-
-## Run tests
-
+ 
+---
+ 
+## Pré-requisitos
+ 
+- [Node.js](https://nodejs.org/) v16+
+- [npm](https://www.npmjs.com/)
+- Conta no [MongoDB Atlas](https://www.mongodb.com/atlas) ou instância local do MongoDB
+---
+ 
+## Instalação
+ 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# 1. Clone o repositório
+git clone https://github.com/Tenpo0000/First-API.git
+cd First-API
+ 
+# 2. Instale as dependências
+npm install
+ 
+# 3. Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o .env com sua connection string do MongoDB
+ 
+# 4. Gere o Prisma Client
+npx prisma generate
+ 
+# 5. Inicie o servidor
+npm run start:dev
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+ 
+---
+ 
+## Variáveis de Ambiente
+ 
+Crie um arquivo `.env` na raiz do projeto com:
+ 
+```env
+DATABASE_URL="mongodb+srv://<usuario>:<senha>@<cluster>.mongodb.net/<banco>?retryWrites=true&w=majority"
+```
+ 
+---
+ 
+## Scripts disponíveis
+ 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Desenvolvimento (hot reload)
+npm run start:dev
+ 
+# Produção
+npm run start:prod
+ 
+# Build
+npm run build
+ 
+# Testes unitários
+npm run test
+ 
+# Testes e2e
+npm run test:e2e
+ 
+# Cobertura de testes
+npm run test:cov
+ 
+# Lint
+npm run lint
 ```
+ 
+---
+ 
+## Endpoints
+ 
+### Livros `/books`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/books` | Lista todos os livros |
+| GET | `/books/:id` | Busca livro por ID |
+| POST | `/books` | Cria um novo livro |
+| PATCH | `/books/:id` | Atualiza um livro |
+| DELETE | `/books/:id` | Remove um livro |
+ 
+### Usuários `/users`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/users` | Lista todos os usuários |
+| GET | `/users/:id` | Busca usuário por ID |
+| POST | `/users` | Cria um novo usuário |
+| PATCH | `/users/:id` | Atualiza um usuário |
+| DELETE | `/users/:id` | Remove um usuário |
+ 
+### Autores `/autores`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/autores` | Lista todos os autores |
+| POST | `/autores` | Cria um novo autor |
+| PATCH | `/autores/:id` | Atualiza um autor |
+| DELETE | `/autores/:id` | Remove um autor |
+ 
+### Editoras `/editoras`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/editoras` | Lista todas as editoras |
+| POST | `/editoras` | Cria uma nova editora |
+| PATCH | `/editoras/:id` | Atualiza uma editora |
+| DELETE | `/editoras/:id` | Remove uma editora |
+ 
+### Categorias `/categorias`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/categorias` | Lista todas as categorias |
+| POST | `/categorias` | Cria uma nova categoria |
+| PATCH | `/categorias/:id` | Atualiza uma categoria |
+| DELETE | `/categorias/:id` | Remove uma categoria |
+ 
+### Empréstimos `/emprestimos`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/emprestimos` | Lista todos os empréstimos |
+| GET | `/emprestimos/:id` | Busca empréstimo por ID |
+| POST | `/emprestimos` | Registra novo empréstimo |
+| PATCH | `/emprestimos/:id` | Atualiza status do empréstimo |
+ 
+### Reservas `/reservas`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/reservas` | Lista todas as reservas |
+| POST | `/reservas` | Cria uma nova reserva |
+| PATCH | `/reservas/:id` | Atualiza status da reserva |
+| DELETE | `/reservas/:id` | Cancela uma reserva |
+ 
+### Favoritos `/favoritos`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/favoritos/usuario/:id` | Lista favoritos de um usuário |
+| POST | `/favoritos` | Adiciona livro aos favoritos |
+| DELETE | `/favoritos/:id` | Remove dos favoritos |
+ 
+### Histórico `/historico`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/historico/usuario/:id` | Histórico de ações de um usuário |
+ 
+---
+ 
+## Autor
+ 
+**Laerte Dutra da Silva**
+ 
+[![LinkedIn](https://img.shields.io/badge/-LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/laerte-dutra-da-silva-e-silva-7419813a0/)
+[![Instagram](https://img.shields.io/badge/-Instagram-E4405F?style=flat&logo=instagram&logoColor=white)](https://www.instagram.com/laerte_dutra/)
+[![Gmail](https://img.shields.io/badge/-Gmail-333?style=flat&logo=gmail&logoColor=white)](mailto:laertelai12@gmail.com)
+ 
+---
+ 
+> **Nota:** Os endpoints listados são baseados na estrutura do schema do banco de dados. Ajuste conforme a implementação real dos controllers.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Projeto ainda em construção 
