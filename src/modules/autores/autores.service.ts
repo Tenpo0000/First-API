@@ -4,17 +4,19 @@ import { UpdateAutores } from './dtos/update-autores.dto.js';
 import { prisma } from '../../lib/prisma.js';
 @Injectable()
 export class AutoresService {
-
+  // mensagens de erros:
   private throwNotFound() :never{
     throw new NotFoundException("o Autor com as credenciais informadas não foi encontrado!");
   }
 
+  // Creates:
   async create(dto: CreateAutores){
     return prisma.autor.create({
       data:{...dto}
     });
   }
 
+  // Deletes:
   async deleteByName(nome: string){
     const autor = await prisma.autor.findUnique({
       where: {nome: nome}
@@ -43,6 +45,7 @@ export class AutoresService {
     });
   }
 
+  // Updates:
   async updateByName(nome: string, dto: UpdateAutores){
     const autor = await prisma.autor.findUnique({
       where: {nome: nome}
@@ -73,6 +76,7 @@ export class AutoresService {
     });
   }
 
+  // Gets:
   async findAll(){
     return prisma.autor.findMany();
   }
@@ -106,7 +110,7 @@ export class AutoresService {
     });
   }
 
-  async findUpdateOnDay(date: Date){
+  async findUpdatedOnDay(date: Date){
     const start = new Date(date);
     start.setHours(0,0,0,0);
 
@@ -132,7 +136,7 @@ export class AutoresService {
   }
 
   async findUpdatedBefore(date: Date){
-    return prisma.categoria.findMany({
+    return prisma.autor.findMany({
       where:{
         updatedAt:{lte: date},
       }
