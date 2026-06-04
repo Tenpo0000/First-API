@@ -5,8 +5,8 @@ import { prisma } from '../../lib/prisma.js';
 @Injectable()
 export class AutoresService {
 
-  private throwNotFound() {
-    throw new NotFoundException("Autor com as credenciais informadas não foi encontrado!");
+  private throwNotFound() :never{
+    throw new NotFoundException("o Autor com as credenciais informadas não foi encontrado!");
   }
 
   async create(dto: CreateAutores){
@@ -130,6 +130,15 @@ export class AutoresService {
       }
     });
   }
+
+  async findUpdatedBefore(date: Date){
+    return prisma.categoria.findMany({
+      where:{
+        updatedAt:{lte: date},
+      }
+    });
+  }
+
 
   async findUpdatedBetween(start: Date, end: Date){
     return prisma.autor.findMany({
