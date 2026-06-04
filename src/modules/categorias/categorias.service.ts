@@ -1,42 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { prisma } from '../../lib/prisma.js';
 import { CreateCategoriaDto } from './dtos/create-categorias.dto.js';
 import { UpdateCategoriaDto} from './dtos/update-categorias.dto.js';
 import { ValidationBookDto } from './dtos/validation-book.dto.js';
 @Injectable()
 export class CategoriasService {
+// mensagens de erros:
+  private throwNotFoundCategoria() :never{
+    throw new NotFoundException(`A categoria com as credenciais informadas não foi encontrado!`)
+  }
+
+  private throwNotFoundLivro():never{
+    throw new NotFoundException(`o livro com as credenciais informadas não foi encontrado!`)
+  }
 
 // Creates:
   async create(dto: CreateCategoriaDto) {
     return prisma.categoria.create({
-      data: {
-        nome: dto.nome,
-        titulo: dto.titulo
-      },
+      data: {...dto}
     });
   }
 
   async addBookCategory(dto: ValidationBookDto, categoriaNome: string){
     const livro = await prisma.books.findFirst({
-      where:{titulo: dto.titulo},
+      where:{titulo: dto.titulo}
     });
-
+    
     if (!livro){
-      throw new Error(`Livro com título "${dto.titulo}" não foi encontrado!`);
+      this.throwNotFoundLivro();
     }
 
     const categoria = await prisma.categoria.findFirst({
-      where: {nome: categoriaNome},
+      where: {nome: categoriaNome}
     });
-    
+
     if (!categoria) {
-      throw new Error(`Categoria "${categoriaNome}" não foi encontrada!`);
+      this.throwNotFoundCategoria();
     }
 
     return prisma.categoria.update({
       where:{nome: categoriaNome},
-      data:{
-        livroIds:{ push: livro.id },
+      data:{livroIds:{ push: livro.id}
       }
     });
   }
@@ -44,113 +48,166 @@ export class CategoriasService {
 
 // Deletes:
   async deleteByName(nome: string) {
+    const categoriaNome = await prisma.categoria.findUnique({
+      where:{nome: nome}
+    })
+
+    if(!categoriaNome){
+      this.throwNotFoundCategoria();
+    }
+
     return prisma.categoria.delete({
-      where: {nome: nome},
+      where: {nome: nome}
     });
   }
 
   async deleteById(id: string) {
+    const categoriaId = await prisma.categoria.findUnique({
+      where:{id: id}
+    })
+
+    if(!categoriaId){
+      this.throwNotFoundCategoria();
+    }
     return prisma.categoria.delete({
-      where: { id },
+      where: {id}
     });
   }
 //
 
 // Updates:
   async updateByName(nomeAntigo: string, dto: UpdateCategoriaDto){
+    const categoriaNome = await prisma.categoria.findUnique({
+      where:{nome: nomeAntigo}
+    })
+
+    if(!categoriaNome){
+      this.throwNotFoundCategoria();
+    }
+
     return prisma.categoria.update({
-      where:{ 
-        nome: nomeAntigo
-      },
-      data:{
-        nome: dto.nome,
-        titulo: dto.titulo,
-      },
+      where:{nome: nomeAntigo},
+      data:{...dto}
     });
   }
 
   async updateById(id: string, dto: UpdateCategoriaDto){
+    const categoriaId = await prisma.categoria.findUnique({
+      where:{id: id}
+    })
+
+    if(!categoriaId){
+      this.throwNotFoundCategoria();
+    }
+
     return prisma.categoria.update({
-      where:{
-          id
-      },
-      data:{
-        nome: dto.nome,
-        titulo: dto.titulo,
-      },
+      where:{id},
+      data:{...dto}
     });
   }
 
   async deleteBookCategory(dto: ValidationBookDto, categoriaNome: string){
     const livro = await prisma.books.findFirst({
-      where: {titulo: dto.titulo},
+      where: {titulo: dto.titulo}
     });
     
     if(!livro){
-      throw new Error(`Livro com título "${dto.titulo}" não foi encontrado!`);
+      this.throwNotFoundLivro();
     }
 
     const categoria = await prisma.categoria.findFirst({
-      where: {nome: categoriaNome},
+      where: {nome: categoriaNome}
     });
     
     if (!categoria) {
-      throw new Error(`Categoria "${categoriaNome}" não foi encontrada!`);
+      this.throwNotFoundCategoria();
     }
-
 
     const novosLivros = categoria.livroIds.filter(id => id !== livro.id);
 
     return prisma.categoria.update({
       where:{nome: categoriaNome},
-      data:{
-           livrosIds:{novosLivros},
-      },
+      data:{livrosIds: novosLivros}
     });
   }
 //
-
 
 // Gets:
   async findAll(){
     return prisma.categoria.findMany();
   }
 
-  async findId(id: string){
-    return prisma.categoria.findUnique({
-      where: {id},
-    });
+  async findById(id: string){
+    const categoriaId = await prisma.categoria.findUnique({
+      where:{id: id}
+    })
+
+    if(!categoriaId){
+      this.throwNotFoundCategoria();
+    }
+
+    return categoriaId
   }
 
-  async findName(nome: string){
-    return prisma.categoria.findMany({
-      where: {nome},
-    });
+  async findByName(nome: string){
+    const categoriaNome = await prisma.categoria.findUnique({
+      where:{nome: nome}
+    })
+
+    if(!categoriaNome){
+      this.throwNotFoundCategoria();
+    }
+
+    return categoriaNome
   }
 
-  async findCreatedAt(createdAt: Date){
+  async findCreatedAt(date: Date){
+    const start = new Date(date)
+    start.setHours(0,0,0,0)
+
+    const end = new Date(date)
+    end.setHours(23,59,59,999)
+
      return prisma.categoria.findMany({
-      where: {createdAt},
+      where: {
+        createdAt:{
+          gte: start,
+          lte: end
+        }
+      },
      });
   }
 
-  async findUpdateAt(updateAt: Date){
+  async findUpdateAt(date: Date){
+    const start = new Date(date)
+    start.setHours(0,0,0,0)
+
+    const end = new Date(date)
+    end.setHours(23,59,59,999)
+
     return prisma.categoria.findMany({
       where:{
-        updatedAt: { 
-          equals: updateAt,
-        },
-      },
+        updatedAt: {
+          gte:start,
+          lte:end
+        }
+      }
     });
   }
 
-  async findUpdatedAfter(updateAt: Date){
+  async findUpdatedAfter(date: Date){
     return prisma.categoria.findMany({
       where:{
-        updatedAt:{
-          gte: updateAt,
-        },
-      },
+        updatedAt:{gte: date},
+      }
+    });
+  }
+
+  async findUpdatedBefore(date: Date){
+    return prisma.categoria.findMany({
+      where:{
+        updatedAt:{lte: date},
+      }
     });
   }
 
@@ -159,9 +216,9 @@ export class CategoriasService {
         where:{
           updatedAt:{
             gte: start,
-            lte: end,
-          },
-        },
+            lte: end
+          }
+        }
     });
   }
 //
