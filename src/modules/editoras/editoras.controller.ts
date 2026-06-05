@@ -78,7 +78,7 @@ export class EditorasController {
     return this.editoraService.findUpdatedBefore(new Date(data));
   }
 
-  @Get('/findUpdatedBetween/:start/:end')
+  @Get('findUpdatedBetween/:start/:end')
   async findUpdatedBetween(@Param('start') start: string,@Param('end') end: string){
     return this.editoraService.findUpdatedBetween(new Date(start), new Date(end));
   }
