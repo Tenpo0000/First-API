@@ -93,11 +93,11 @@ export class AutoresService {
     return autor
   }
 
-  async findCreatedOnDay(date: Date){
-    const start = new Date(date);
+  async findCreatedOnDay(data: Date){
+    const start = new Date(data);
     start.setHours(0,0,0,0);
 
-    const end = new Date(date);
+    const end = new Date(data);
     end.setHours(23,59,59,999);
 
     return prisma.autor.findMany({
@@ -110,11 +110,11 @@ export class AutoresService {
     });
   }
 
-  async findUpdatedOnDay(date: Date){
-    const start = new Date(date);
+  async findUpdatedOnDay(data: Date){
+    const start = new Date(data);
     start.setHours(0,0,0,0);
 
-    const end = new Date(date);
+    const end = new Date(data);
     end.setHours(23,59,59,999);
 
     return prisma.autor.findMany({
@@ -127,18 +127,18 @@ export class AutoresService {
     });
   }
   
-  async findUpdatedAfter(UpdatedAfter: Date){
+  async findUpdatedAfter(data: Date){
     return prisma.autor.findMany({
       where:{
-        updatedAt:{ gte: UpdatedAfter }
+        updatedAt:{ gte: data }
       }
     });
   }
 
-  async findUpdatedBefore(date: Date){
+  async findUpdatedBefore(data: Date){
     return prisma.autor.findMany({
       where:{
-        updatedAt:{lte: date},
+        updatedAt:{lte: data},
       }
     });
   }
@@ -156,5 +156,4 @@ export class AutoresService {
   }
 }
 
-//futuramente fazer:
-//criar um interceptor global para capturar e formatar erros de forma uniforme em toda a API para evitar duplicação de mensagens.
+// TODO: criar interceptor global para formatar erros uniformemente
