@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { prisma } from '../../lib/prisma.js';
 import { CreateEditoras } from './dtos/create-editoras.dto.js';
 import { UpdateEditoras } from './dtos/update-editoras.dto.js';
-import { throwError } from 'rxjs';
 
 @Injectable()
 export class EditorasService {
@@ -139,7 +138,7 @@ export class EditorasService {
 
   async findCreatedBefore(data: Date){
     const end = new Date(data)
-    end.setHours(0,0,0,0)
+    end.setHours(23,59,59,999)
 
     return prisma.editora.findMany({
       where:{
@@ -196,7 +195,7 @@ export class EditorasService {
 
   async findUpdatedBefore(data: Date){
     const end = new Date(data)
-    end.setHours(0,0,0,0)
+    end.setHours(23,59,59,999)
 
     return prisma.editora.findMany({
       where:{
