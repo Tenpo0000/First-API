@@ -6,74 +6,74 @@ import { ValidationBookDto } from './dtos/validation-book.dto.js';
 
 @Controller('categorias')
 export class CategoriasController {
-  constructor(private readonly CategoriaService: CategoriasService){}
+  constructor(private readonly categoriaService: CategoriasService){}
 
   @Post()
   async create(@Body() dto: CreateCategoriaDto){
-    return this.CategoriaService.create(dto);
+    return this.categoriaService.create(dto);
   }
 
   @Post(':nome/adicionarLivro/')
   async addBookCategory(@Body() dto: ValidationBookDto, @Param('nome') categoriaNome: string){
-    return this.CategoriaService.addBookCategory(dto,categoriaNome);
+    return this.categoriaService.addBookCategory(dto,categoriaNome);
   }
   
   @Patch(':nome/removerLivro/')
-  async deleteBookCategory(@Param() dto: ValidationBookDto,categoriaNome: string ){
-    return this.CategoriaService.deleteBookCategory(dto,categoriaNome);
+  async deleteBookCategory(@Body() dto: ValidationBookDto, @Param('nome') categoriaNome: string ){
+    return this.categoriaService.deleteBookCategory(dto,categoriaNome);
   }
 
-  @Patch(':nome')
+  @Patch('/updateByName/:nome')
   async updateByName(@Param('nome') nomeAntigo: string, @Body() dto: UpdateCategoriaDto){
-    return this.CategoriaService.updateByName(nomeAntigo, dto);
+    return this.categoriaService.updateByName(nomeAntigo, dto);
   }
 
-  @Patch(':id')
+  @Patch('/updateById/:id')
   async updateById(@Param('id') id: string, @Body() dto: UpdateCategoriaDto){
-    return this.CategoriaService.updateById(id, dto);
+    return this.categoriaService.updateById(id, dto);
   } 
-  @Delete(':nome')
+  @Delete('/deleteByName/:nome')
   async deleteByName(@Param('nome') nome: string) {
-    return this.CategoriaService.deleteByName(nome);
+    return this.categoriaService.deleteByName(nome);
   }
 
-  @Delete(':id')
+  @Delete('/deleteById/:id')
   async deleteById(@Param('id') id: string) {
-    return  this.CategoriaService.deleteById(id);
+    return  this.categoriaService.deleteById(id);
   }
 
   @Get()
-  async findAll(){
-    return this.CategoriaService.findAll();
+  async findAll(@Query('nome') nome?: string, @Query('id') id?: string){  
+    if(nome){
+      return this.categoriaService.findByName(nome)
+    } else if(id){
+      return this.categoriaService.findById(id)
+    }
+    return this.categoriaService.findAll()
   }
 
-  @Get(':id')
-  async findId(@Param('id')id: string){ 
-    return this.CategoriaService.findId(id);
+  @Get('/findCreatedOnDay/:data')
+  async findCreatedOnDay(@Param('data') data: string){
+    return this.categoriaService.findCreatedOnDay(new Date(data))
   }
 
-  @Get(':nome')
-  async findName(@Param('nome') nome: string){
-    return this.CategoriaService.findName(nome);
+  @Get('/findUpdatedOnDay/:data')
+  async findUpdatedOnDay(@Param('data') data: string){
+    return this.categoriaService.findUpdatedOnDay(new Date(data))
   }
 
-  @Get('/findCreatedAt/:date')
-  async findCreatedAt(@Param('date') createdAt: Date){
-    return this.CategoriaService.findCreatedAt(createdAt);
-  }
-  
-  @Get('/findUpdateAt/:date')
-  async findUpdateAt(@Param('date') updateAt: Date){
-    return this.CategoriaService.findUpdateAt(updateAt);
+  @Get('/findUpdatedAfter/:data')
+  async findUpdatedAfter(@Param('data') data: string){
+    return this.categoriaService.findUpdatedAfter(new Date(data))
   }
 
-  @Get('/findUpdatedAfter/:date')
-  async findUpdatedAfter(@Param('date') updateAt: Date){
-    return this.CategoriaService.findUpdatedAfter(updateAt);
+  @Get('/findUpdatedBefore/:data')
+  async findUpdatedBefore(@Param('data') data: string){
+    return this.categoriaService.findUpdatedBefore(new Date(data))
   }
 
-  @Get('/findUpdatedBetween/')
-  async findUpdatedBetween(@Query('start') start: Date, @Query('end') end: Date){
-    return this.CategoriaService.findUpdatedBetween(start, end);
+  @Get('/findUpdatedBetween/:start/:end')
+  async findUpdatedBetween(@Param('start') start: string,@Param('end') end: string){
+    return this.categoriaService.findUpdatedBetween(new Date(start), new Date(end))
   }
 }
