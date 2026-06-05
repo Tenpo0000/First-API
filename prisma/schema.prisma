@@ -60,7 +60,6 @@ model Editora {
   pais      String
   CNPJ      String?
   site      String?
-  fundadaEm Int? 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }

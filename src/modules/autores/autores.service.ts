@@ -5,7 +5,7 @@ import { prisma } from '../../lib/prisma.js';
 @Injectable()
 export class AutoresService {
   // mensagens de erros:
-  private throwNotFound() :never{
+  private throwNotFoundAutor() :never{
     throw new NotFoundException("o Autor com as credenciais informadas não foi encontrado!");
   }
 
@@ -19,59 +19,59 @@ export class AutoresService {
   // Deletes:
   async deleteByName(nome: string){
     const autor = await prisma.autor.findUnique({
-      where: {nome: nome}
+      where: {nome}
     })
 
     if (!autor){
-      this.throwNotFound()
+      this.throwNotFoundAutor()
     }
 
     return prisma.autor.delete({
-      where:{ nome: nome }
+      where:{nome}
     });
   }
 
   async deleteById(id: string){
     const autor = await prisma.autor.findUnique({
-      where: {id: id}
+      where: {id}
     })
 
     if (!autor){
-      this.throwNotFound()
+      this.throwNotFoundAutor()
     }
 
     return prisma.autor.delete({
-      where:{ id: id }
+      where:{id}
     });
   }
 
   // Updates:
   async updateByName(nome: string, dto: UpdateAutores){
     const autor = await prisma.autor.findUnique({
-      where: {nome: nome}
+      where: {nome}
     })
 
     if (!autor){
-      this.throwNotFound()
+      this.throwNotFoundAutor()
     }
 
     return prisma.autor.update({
-      where:{ nome: nome },
+      where:{nome},
       data:{...dto}
     });
   }
 
   async updateById(id: string, dto: UpdateAutores){
     const autor = await prisma.autor.findUnique({
-      where: {id: id}
+      where: {id}
     });
 
     if (!autor){
-      this.throwNotFound()
+      this.throwNotFoundAutor()
     }
 
     return prisma.autor.update({
-      where: { id: id },
+      where: {id},
       data: {...dto}
     });
   }
@@ -81,13 +81,23 @@ export class AutoresService {
     return prisma.autor.findMany();
   }
 
+  async findById(id: string){
+    const categoriaId = await prisma.autor.findUnique({
+      where:{id}
+    })
+
+    if(!categoriaId){
+      this.throwNotFoundAutor();
+    }
+  }
+
   async findByName(nome: string){
     const autor = await prisma.autor.findUnique({
-      where: {nome: nome}
+      where: {nome}
     });
 
     if (!autor){
-      this.throwNotFound()
+      this.throwNotFoundAutor()
     }
 
     return autor
@@ -108,6 +118,46 @@ export class AutoresService {
         }
       }
     });
+  }
+
+  async findCreatedAfter(data:Date){
+    const start = new Date(data)
+    start.setHours(0,0,0,0)
+
+    return prisma.autor.findMany({
+      where:{
+        createdAt:{
+          gte:start
+        }
+      }
+    })
+  }
+
+  async findCreatedBefore(data: Date){
+    const end = new Date(data)
+    end.setHours(0,0,0,0)
+
+    return prisma.autor.findMany({
+      where:{
+        createdAt:{
+          lte: end
+        }
+      }
+    })
+  }
+
+  async findCreatedBetween(start: Date, end: Date){
+    start.setHours (0,0,0,0)
+    end.setHours(23,59,59,999)
+
+    return prisma.autor.findMany({
+      where:{
+        createdAt:{
+          gte: start,
+          lte: end
+        }
+      }
+    })
   }
 
   async findUpdatedOnDay(data: Date){
@@ -142,7 +192,6 @@ export class AutoresService {
       }
     });
   }
-
 
   async findUpdatedBetween(start: Date, end: Date){
     return prisma.autor.findMany({

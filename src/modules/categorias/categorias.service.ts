@@ -24,7 +24,7 @@ export class CategoriasService {
   // Deletes:
   async deleteByName(nome: string) {
     const categoriaNome = await prisma.categoria.findUnique({
-      where:{nome: nome}
+      where:{nome}
     })
 
     if(!categoriaNome){
@@ -32,13 +32,13 @@ export class CategoriasService {
     }
     
     return prisma.categoria.delete({
-      where: {nome: nome}
+      where: {nome}
     });
   }
   
   async deleteById(id: string) {
     const categoriaId = await prisma.categoria.findUnique({
-      where:{id: id}
+      where:{id}
     })
 
     if(!categoriaId){
@@ -50,9 +50,9 @@ export class CategoriasService {
   }
 
   // Updates:
-  async updateByName(nomeAntigo: string, dto: UpdateCategoriaDto){
+  async updateByName(nome: string, dto: UpdateCategoriaDto){
     const categoriaNome = await prisma.categoria.findUnique({
-      where:{nome: nomeAntigo}
+      where:{nome}
     })
     
     if(!categoriaNome){
@@ -60,14 +60,14 @@ export class CategoriasService {
     }
     
     return prisma.categoria.update({
-      where:{nome: nomeAntigo},
+      where:{nome},
       data:{...dto}
     });
   }
 
   async updateById(id: string, dto: UpdateCategoriaDto){
     const categoriaId = await prisma.categoria.findUnique({
-      where:{id: id}
+      where:{id}
     })
     
     if(!categoriaId){
@@ -136,7 +136,7 @@ export class CategoriasService {
 
   async findById(id: string){
     const categoriaId = await prisma.categoria.findUnique({
-      where:{id: id}
+      where:{id}
     })
 
     if(!categoriaId){
@@ -148,7 +148,7 @@ export class CategoriasService {
 
   async findByName(nome: string){
     const categoriaNome = await prisma.categoria.findUnique({
-      where:{nome: nome}
+      where:{nome}
     })
 
     if(!categoriaNome){
@@ -173,6 +173,46 @@ export class CategoriasService {
         }
       },
      });
+  }
+
+  async findCreatedAfter(data:Date){
+    const start = new Date(data)
+    start.setHours(0,0,0,0)
+
+    return prisma.categoria.findMany({
+      where:{
+        createdAt:{
+          gte:start
+        }
+      }
+    })
+  }
+
+  async findCreatedBefore(data: Date){
+    const end = new Date(data)
+    end.setHours(0,0,0,0)
+
+    return prisma.categoria.findMany({
+      where:{
+        createdAt:{
+          lte: end
+        }
+      }
+    })
+  }
+
+  async findCreatedBetween(start: Date, end: Date){
+    start.setHours (0,0,0,0)
+    end.setHours(23,59,59,999)
+
+    return prisma.categoria.findMany({
+      where:{
+        createdAt:{
+          gte: start,
+          lte: end
+        }
+      }
+    })
   }
 
   async findUpdatedOnDay(date: Date){
