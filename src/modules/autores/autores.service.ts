@@ -135,7 +135,7 @@ export class AutoresService {
 
   async findCreatedBefore(data: Date){
     const end = new Date(data)
-    end.setHours(0,0,0,0)
+    end.setHours(23,59,59,999)
 
     return prisma.autor.findMany({
       where:{
@@ -178,19 +178,29 @@ export class AutoresService {
   }
   
   async findUpdatedAfter(data: Date){
+     const start = new Date(data)
+    start.setHours(0,0,0,0)
+
     return prisma.autor.findMany({
       where:{
-        updatedAt:{ gte: data }
+        updatedAt:{
+          gte:start
+        }
       }
-    });
+    })
   }
 
   async findUpdatedBefore(data: Date){
+    const end = new Date(data)
+    end.setHours(23,59,59,999)
+
     return prisma.autor.findMany({
       where:{
-        updatedAt:{lte: data},
+        updatedAt:{
+          lte: end
+        }
       }
-    });
+    })
   }
 
   async findUpdatedBetween(start: Date, end: Date){
