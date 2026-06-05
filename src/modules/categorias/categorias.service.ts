@@ -190,7 +190,7 @@ export class CategoriasService {
 
   async findCreatedBefore(data: Date){
     const end = new Date(data)
-    end.setHours(0,0,0,0)
+    end.setHours(23,59,59,999)
 
     return prisma.categoria.findMany({
       where:{
@@ -215,11 +215,11 @@ export class CategoriasService {
     })
   }
 
-  async findUpdatedOnDay(date: Date){
-    const start = new Date(date)
+  async findUpdatedOnDay(data: Date){
+    const start = new Date(data)
     start.setHours(0,0,0,0)
 
-    const end = new Date(date)
+    const end = new Date(data)
     end.setHours(23,59,59,999)
 
     return prisma.categoria.findMany({
@@ -232,18 +232,24 @@ export class CategoriasService {
     });
   }
 
-  async findUpdatedAfter(date: Date){
+  async findUpdatedAfter(data: Date){
+    const start = new Date(data)
+    start.setHours(0,0,0,0)
+
     return prisma.categoria.findMany({
       where:{
-        updatedAt:{gte: date},
+        updatedAt:{gte: start},
       }
     });
   }
 
   async findUpdatedBefore(date: Date){
+    const end = new Date(date)
+    end.setHours(23,59,59,999)
+
     return prisma.categoria.findMany({
       where:{
-        updatedAt:{lte: date},
+        updatedAt:{lte: end},
       }
     });
   }
